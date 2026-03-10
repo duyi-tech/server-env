@@ -5,8 +5,7 @@
 
 # 检查是否已安装 Docker
 if command -v docker &> /dev/null; then
-    echo "Docker 已安装，跳过安装步骤"
-    docker --version
+    echo "Docker 已存在，当前版本：$(docker --version)"
     exit 0
 fi
 
