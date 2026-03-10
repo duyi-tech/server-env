@@ -71,7 +71,7 @@ create_network() {
 setup_traefik() {
     echo -e "${YELLOW}=== 步骤 2: 配置 Traefik ===${NC}"
 
-    mkdir -p ${TRAEFIK_DIR}/letsencrypt
+    mkdir -p ${TRAEFIK_DIR}
     cd ${TRAEFIK_DIR}
 
     # 生成 traefik.yml
@@ -145,7 +145,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/traefik.yml:ro
-      - ./letsencrypt:/letsencrypt
+      - traefik_certs:/letsencrypt
     environment:
       - TRAEFIK_LOG_LEVEL=${TRAEFIK_LOG_LEVEL}
       - TRAEFIK_PROVIDERS_DOCKER_NETWORK=${TRAEFIK_NETWORK}
@@ -160,6 +160,10 @@ services:
     networks:
       - traefik-public
 
+volumes:
+  traefik_certs:
+    name: traefik_certs
+
 networks:
   traefik-public:
     external: true
@@ -167,10 +171,7 @@ EOF
 
     echo -e "${GREEN}✓ Traefik 配置文件已生成${NC}"
     echo -e "${YELLOW}使用邮箱: ${TRAEFIK_EMAIL}${NC}"
-
-    # 设置权限
-    touch ${TRAEFIK_DIR}/letsencrypt/acme.json
-    chmod 600 ${TRAEFIK_DIR}/letsencrypt/acme.json
+    echo -e "${YELLOW}证书存储: Docker Volume (traefik_certs)${NC}"
 }
 
 # 启动 Traefik
@@ -231,11 +232,14 @@ main() {
     echo "========================================"
     echo ""
     echo "配置目录: ${TRAEFIK_DIR}/"
+    echo "证书卷: traefik_certs (可用于服务器迁移)"
     echo ""
     echo "常用命令:"
     echo "  docker ps                      - 查看运行中的容器"
     echo "  docker logs traefik            - 查看 Traefik 日志"
     echo "  cd ${TRAEFIK_DIR} && docker compose logs -f  - 实时查看日志"
+    echo "  docker volume ls | grep traefik - 查看数据卷"
+    echo "  docker volume inspect traefik_certs - 查看证书卷详情"
     echo ""
 }
 
