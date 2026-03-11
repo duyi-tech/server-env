@@ -16,6 +16,7 @@
 - 🌐 **HTTPS 支持** - 内置 Traefik 反向代理，自动申请 Let's Encrypt 证书
 - 🚀 **国内加速** - 自动尝试国内镜像源，解决拉取失败问题
 - 📊 **资源限制** - 支持为每个服务设置内存限制
+- 👤 **部署用户** - 自动创建 deploy 用户并配置 SSH 密钥和部署目录权限
 
 ## 📦 包含服务
 
@@ -90,6 +91,32 @@ docker logs traefik
 
 # 查看 MongoDB 日志
 docker logs mongodb
+```
+
+### 5. 配置部署用户（可选）
+
+如需创建专门用于部署产品的用户，可运行：
+
+```bash
+# 创建 deploy 用户并配置 SSH 密钥和部署目录
+sudo bash basic-env/user/setup.sh
+```
+
+此脚本会：
+- 创建 `deploy` 用户（如果不存在）
+- 生成 SSH 密钥对到 `/home/deploy/.ssh/`（如果不存在）
+- 创建 `PRODUCTS_DIR` 目录（默认为 `/opt/products`，可在 `.env` 中配置）
+- 赋予 `deploy` 用户对 `PRODUCTS_DIR` 的完全权限
+
+**使用场景：**
+- CI/CD 自动部署产品
+- 团队成员使用 SSH 密钥登录服务器进行部署
+- 隔离部署用户和 root 用户权限
+
+配置项（在 `.env` 中设置）：
+```bash
+# 部署目录（默认 /opt/products）
+PRODUCTS_DIR=/opt/products
 ```
 
 ## ⚙️ 详细配置
@@ -382,7 +409,9 @@ server-env/
 ├── AGENTS.md               # 工程规范说明
 ├── basic-env/              # 基础环境搭建
 │   ├── setup.sh
-│   └── docker/
+│   ├── docker/
+│   └── user/               # 部署用户配置
+│       └── setup.sh        # 创建 deploy 用户和 SSH 密钥
 └── docker/                 # Docker 服务
     ├── setup.sh            # Docker 服务总入口
     ├── traefik/            # 反向代理
