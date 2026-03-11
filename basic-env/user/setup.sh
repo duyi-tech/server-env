@@ -77,7 +77,45 @@ setup_deploy_user() {
     chmod 700 "$ssh_dir"
     chmod 600 "$private_key"
     chmod 644 "$public_key"
+    
+    # 将公钥添加到 authorized_keys 以便其他机器可以通过公钥登录
+    if [ ! -f "$ssh_dir/authorized_keys" ]; then
+        log_info "创建 authorized_keys 文件..."
+        cp "$public_key" "$ssh_dir/authorized_keys"
+        chmod 600 "$ssh_dir/authorized_keys"
+        chown "$username:$username" "$ssh_dir/authorized_keys"
+        log_info "authorized_keys 创建完成"
+    else
+        log_warn "authorized_keys 已存在，跳过复制"
+    fi
+    
     log_info "SSH 目录权限设置完成"
+}
+
+setup_docker_permissions() {
+    local username="deploy"
+    
+    log_info "配置 Docker 权限..."
+    
+    # 检查 docker 组是否存在
+    if getent group docker &>/dev/null; then
+        log_info "docker 组已存在"
+    else
+        log_info "创建 docker 组..."
+        groupadd docker
+    fi
+    
+    # 将 deploy 用户添加到 docker 组
+    if id -nG "$username" | grep -qw "docker"; then
+        log_warn "用户 $username 已在 docker 组中"
+    else
+        log_info "将用户 $username 添加到 docker 组..."
+        usermod -aG docker "$username"
+        log_info "用户 $username 已添加到 docker 组"
+    fi
+    
+    log_info "Docker 权限配置完成"
+    log_warn "注意: 用户需要重新登录才能使 Docker 权限生效"
 }
 
 setup_products_dir() {
@@ -103,11 +141,14 @@ main() {
     check_linux
     check_root
     setup_deploy_user
+    setup_docker_permissions
     setup_products_dir
     
     log_info "deploy 用户配置完成"
     log_info "SSH 公钥位于: /home/deploy/.ssh/id_rsa.pub"
+    log_info "authorized_keys 位于: /home/deploy/.ssh/authorized_keys"
     log_info "PRODUCTS_DIR: ${PRODUCTS_DIR:-/opt/products}"
+    log_info "Docker 权限: deploy 用户已添加到 docker 组"
 }
 
 main

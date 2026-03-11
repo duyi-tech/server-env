@@ -20,3 +20,22 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 
 # 启动服务
 sudo systemctl start docker && sudo systemctl enable docker
+
+# 配置 Docker 镜像加速（每次必做）
+echo "配置 Docker 镜像加速..."
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
+{
+  "registry-mirrors": [
+    "https://m.daocloud.io",
+    "https://docker.aityp.com",
+    "https://docker.1ms.run/"
+  ]
+}
+EOF
+
+# 重启 Docker 服务（每次必做）
+echo "重启 Docker 服务..."
+sudo systemctl restart docker
+
+echo "Docker 配置完成"
