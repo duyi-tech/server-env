@@ -19,12 +19,12 @@
 
 ## 📦 包含服务
 
-| 服务 | 版本 | 说明 |
-|------|------|------|
-| **Traefik** | v3.0 | 反向代理和负载均衡，自动 HTTPS |
-| **MongoDB** | 6.0 | 文档型数据库 |
-| **PostgreSQL** | 16 | 关系型数据库 |
-| **MySQL** | 8.0 | 关系型数据库 |
+| 服务           | 版本 | 说明                           |
+| -------------- | ---- | ------------------------------ |
+| **Traefik**    | v3.0 | 反向代理和负载均衡，自动 HTTPS |
+| **MongoDB**    | 6.0  | 文档型数据库                   |
+| **PostgreSQL** | 16   | 关系型数据库                   |
+| **MySQL**      | 8.0  | 关系型数据库                   |
 
 ## 🚀 快速开始
 
@@ -37,7 +37,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/yourusername/server-env.git
+git clone https://github.com/duyi-tech/server-env.git
 cd server-env
 ```
 
@@ -73,6 +73,7 @@ sudo ./setup.sh
 ```
 
 脚本会自动完成以下步骤：
+
 1. 安装 Docker 和 Docker Compose（如未安装）
 2. 创建共享 Docker 网络 `traefik-public`
 3. 部署 Traefik 反向代理
@@ -137,6 +138,7 @@ MYSQL_DIR=/opt/shared/mysql           # MySQL 配置目录
 ### 服务开关说明
 
 每个服务都有独立的启用/禁用开关，支持的值（不区分大小写）：
+
 - `true`
 - `on`
 - `1`
@@ -168,11 +170,13 @@ docker volume ls
 所有服务都运行在 Docker 内部网络 `traefik-public` 中，其他容器可以通过服务名访问：
 
 **MongoDB 连接字符串：**
+
 ```
 mongodb://root:your_password@mongodb:27017/your_database?authSource=admin
 ```
 
 **PostgreSQL 连接字符串：**
+
 ```
 postgresql://postgres:your_password@postgres:5432/your_database
 ```
@@ -303,6 +307,7 @@ sudo nano /etc/docker/daemon.json
 ```
 
 添加：
+
 ```json
 {
   "registry-mirrors": [
@@ -313,6 +318,7 @@ sudo nano /etc/docker/daemon.json
 ```
 
 然后重启 Docker：
+
 ```bash
 sudo systemctl restart docker
 ```
@@ -329,6 +335,7 @@ sudo systemctl restart docker
 如果您要在此服务器环境上部署自己的应用，请参考 **[SKILL.md](SKILL.md)** 获取详细的 Docker Compose 配置指南。
 
 **SKILL.md 包含：**
+
 - 📄 **基础模板** - 适配本环境的 Docker Compose 结构
 - 🌐 **静态页面托管** - Nginx 配置和域名绑定
 - 🍃 **MongoDB 集成** - 连接字符串配置和数据库创建
@@ -350,11 +357,11 @@ services:
     networks:
       - traefik-public
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.my-site.rule=Host(`www.example.com`)"
-      - "traefik.http.routers.my-site.entrypoints=websecure"
-      - "traefik.http.routers.my-site.tls.certresolver=letsencrypt"
-      - "traefik.http.services.my-site.loadbalancer.server.port=80"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.my-site.rule=Host(`www.example.com`)'
+      - 'traefik.http.routers.my-site.entrypoints=websecure'
+      - 'traefik.http.routers.my-site.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.my-site.loadbalancer.server.port=80'
 
 networks:
   traefik-public:
