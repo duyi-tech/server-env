@@ -69,7 +69,7 @@ POSTGRES_PASSWORD=your_secure_password_here
 ### 3. 执行安装
 
 ```bash
-sudo ./setup.sh
+sudo sh ./setup.sh
 ```
 
 脚本会自动完成以下步骤：
