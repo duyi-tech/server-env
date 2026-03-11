@@ -12,7 +12,6 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # 配置变量
-NETWORK_NAME="traefik-public"
 TRAEFIK_DIR="${TRAEFIK_DIR:-/opt/traefik}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -57,14 +56,14 @@ check_docker() {
 create_network() {
     echo -e "${YELLOW}=== 步骤 1: 创建 Docker 共享网络 ===${NC}"
 
-    if docker network ls | grep -q "${NETWORK_NAME}"; then
-        echo "网络 ${NETWORK_NAME} 已存在，跳过创建"
+    if docker network ls | grep -q "${TRAEFIK_NETWORK}"; then
+        echo "网络 ${TRAEFIK_NETWORK} 已存在，跳过创建"
     else
-        docker network create ${NETWORK_NAME}
-        echo -e "${GREEN}✓ 网络 ${NETWORK_NAME} 创建成功${NC}"
+        docker network create ${TRAEFIK_NETWORK}
+        echo -e "${GREEN}✓ 网络 ${TRAEFIK_NETWORK} 创建成功${NC}"
     fi
 
-    docker network ls | grep ${NETWORK_NAME}
+    docker network ls | grep ${TRAEFIK_NETWORK}
 }
 
 # 创建 Traefik 目录和配置
@@ -158,14 +157,14 @@ services:
       - TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO=websecure
       - TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_SCHEME=https
     networks:
-      - traefik-public
+      - ${TRAEFIK_NETWORK}
 
 volumes:
   traefik_certs:
     name: traefik_certs
 
 networks:
-  traefik-public:
+  ${TRAEFIK_NETWORK}:
     external: true
 EOF
 
